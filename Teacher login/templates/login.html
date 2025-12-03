@@ -74,10 +74,23 @@
     .btn:hover {
         background: #002f66;          /* Darker blue hover */
     }
+    .error-box {
+    background-color: #ffe5e5;
+    border: 1px solid #ff4d4d;
+    padding: 10px;
+    border-radius: 5px;
+    color: #b30000;
+    margin: 10px auto 15px auto;
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+}
+
 </style>
 
 </head>
 <body>
+    
 
 <div class="box">
     <!-- College Logo -->
@@ -96,6 +109,16 @@
 </form>
 
 </div>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="error-box">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 
 </body>
 </html>

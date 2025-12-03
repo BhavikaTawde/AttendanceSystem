@@ -46,7 +46,7 @@ def login():
 
     # verify password (stored as hash in DB)
     if user["password_hash"] != password:
-        flash("Invalid Teacher ID or Password", "error")
+        flash("Invalid Teacher ID or Password")
         return redirect(url_for("index"))
 
     # Successful login → store in session
