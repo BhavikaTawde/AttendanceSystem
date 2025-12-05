@@ -74,10 +74,23 @@
     .btn:hover {
         background: #002f66;          /* Darker blue hover */
     }
+    .error-box {
+    background-color: #ffe5e5;
+    border: 1px solid #ff4d4d;
+    padding: 10px;
+    border-radius: 5px;
+    color: #b30000;
+    margin: 10px auto 15px auto;
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+}
+
 </style>
 
 </head>
 <body>
+    
 
 <div class="box">
     <!-- College Logo -->
@@ -85,17 +98,27 @@
 
     <h2>Teacher Portal</h2>
 
-    <form>
-        <label>Teacher ID:</label>
-        <input type="text" placeholder="Enter Teacher ID" required>
+    <form action="/login" method="post">
+    <label>Teacher ID:</label>
+    <input type="text" name="teacher_id" placeholder="Enter Teacher ID" required>
 
-       
-        <label>Password:</label>
-        <input type="password" placeholder="Enter Password" required>
+    <label>Password:</label>
+    <input type="password" name="password" placeholder="Enter Password" required>
 
-        <button type="submit" class="btn">LOGIN</button>
-    </form>
+    <button type="submit" class="btn">LOGIN</button>
+</form>
+
 </div>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="error-box">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 
 </body>
 </html>
