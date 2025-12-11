@@ -34,8 +34,21 @@ def get_db_connection(autocommit=False):
 
 @app.route("/")
 def index():
-    # Show login page
+    # Show index page with Teacher / Student options
+    return render_template("index.html")
+
+
+@app.route("/teacher_login")
+def teacher_login():
+    # Teacher login page
     return render_template("login.html")
+
+
+@app.route("/student_login")
+def student_login():
+    # Student login page
+    return render_template("student_login.html")
+
 
 
 @app.route("/login", methods=["POST"])
