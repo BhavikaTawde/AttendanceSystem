@@ -6,7 +6,7 @@ def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="140405",        # your XAMPP MySQL password (empty = default)
+        password="123456",        # your XAMPP MySQL password (empty = default)
         database="school"
     )
 
@@ -114,4 +114,7 @@ def delete_teacher():
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
+
+   

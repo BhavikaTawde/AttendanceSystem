@@ -226,21 +226,70 @@ function renderReport(){
   const subject = document.getElementById("subject-select").value;
   const container = document.getElementById("attendance-section");
   container.innerHTML = '';
+  const dateInput = document.getElementById("lecture-time").value;
+  if (!dateInput) {
+    alert("Please select Lecture Date");
+    return;
+  }
 
-  if(report==='month'){
+  const selectedDate = new Date(dateInput);
+  const month = selectedDate.getMonth() + 1; // 1–12
+  const selectedYear = selectedDate.getFullYear();
+   if (report === 'month') {
+
+  fetch("/api/monthly_student_report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      month: month,
+      year: selectedYear
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
     container.innerHTML = `<strong>Monthly Report: ${subject} - ${year} - ${stream}</strong>`;
-    const table = document.createElement('table');
-    table.innerHTML = '<thead><tr><th>Lecture</th><th>Present</th><th>Absent</th></tr></thead>';
-    const tbody = document.createElement('tbody');
-    let keys = Object.keys(attendanceData).filter(k=>k.includes(`${subject}_${year}_${stream}`));
-    keys.forEach((k,i)=>{
-      let present = Object.values(attendanceData[k]).filter(v=>v==='present').length;
-      let absent = Object.values(attendanceData[k]).filter(v=>v==='absent').length;
-      tbody.innerHTML += `<tr><td>Lecture ${i+1}</td><td>${present}</td><td>${absent}</td></tr>`;
+
+    if (!data.length) {
+      container.innerHTML += "<p>No data found</p>";
+      return;
+    }
+
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Total Lectures</th>
+          <th>Present</th>
+          <th>Absent</th>
+          <th>%</th>
+        </tr>
+      </thead>
+    `;
+
+    const tbody = document.createElement("tbody");
+
+    data.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.student_name}</td>
+          <td>${r.total_lectures}</td>
+          <td>${r.attended}</td>
+          <td>${r.missed}</td>
+          <td>${r.percentage}%</td>
+        </tr>
+      `;
     });
+
     table.appendChild(tbody);
     container.appendChild(table);
-  }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error loading monthly report");
+  });
+}
+
 
   else if(report==='semester'){
     container.innerHTML = `<strong>Semester Report: ${subject} - ${year} - ${stream}</strong>`;
