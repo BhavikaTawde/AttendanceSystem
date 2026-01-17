@@ -96,6 +96,27 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
 </head>
 <body>
 
+
+<!-- Custom Defaulter Alert -->
+<div id="def-alert" style="
+  display:none;
+  position:fixed;
+  top:50px;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background:#c23d3d;
+  color:white;
+  padding:18px 26px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  z-index:9999;
+  text-align: center;
+  min-width: 260px;
+">
+</div>
+
 <div class="top-college-logo">
   <img src="{{ url_for('static', filename='sieslogo.jpg') }}" alt="College Logo">
 </div>
@@ -165,6 +186,17 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
 </div>
 
 <script>
+
+  function showDefAlert(msg) {
+  const box = document.getElementById("def-alert");
+  box.innerText = msg;
+  box.style.display = "block";
+
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 2500);
+}
+
 // student data
 let students = [];
 
@@ -463,7 +495,7 @@ else if (report === 'defaulter') {
     const toDate = document.getElementById("def-to").value;
 
     if (!fromDate || !toDate) {
-      alert("Please select both dates");
+      showDefAlert("Please select both dates");
       return;
     }
     const numericYear = getNumericYear(year);  // FY -> 1, SY -> 2, TY -> 3
@@ -546,7 +578,7 @@ document.querySelectorAll("#subject-select, #lecture-time, #report-select")
 
 // Initial load
 // Initial load
-loadTeacherSubjects();   // 👈 load subjects FIRST
+loadTeacherSubjects();   
 renderAttendance();
 loadStudents();
 
