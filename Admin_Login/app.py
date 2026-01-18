@@ -208,6 +208,37 @@ def assign_subject():
     cursor.close()
     db.close()
     return jsonify({"message": "Subject assigned successfully"})
+# ---------- CLASS TEACHER ASSIGNMENT ----------
+@app.route("/api/assign-class-teacher", methods=["POST"])
+def assign_class_teacher():
+    data = request.json
+
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO class_teacher_assignment
+            (teacher_id, stream, year, academic_year)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            data["teacher_id"],
+            data["stream"],
+            data["year"],
+            data["academic_year"]
+        ))
+        db.commit()
+        return jsonify({"message": "Class teacher assigned successfully"})
+
+    except mysql.connector.IntegrityError:
+        return jsonify({
+            "message": "Class teacher already assigned for this class & year"
+        })
+
+    finally:
+        cursor.close()
+        db.close()
+
 
 # ---------- STUDENT MANAGEMENT ----------
 

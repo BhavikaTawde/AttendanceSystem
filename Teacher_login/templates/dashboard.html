@@ -197,6 +197,7 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
   }, 2500);
 }
 
+
 // student data
 let students = [];
 
@@ -487,7 +488,10 @@ else if (report === 'defaulter') {
   `;
 
 
-  
+
+
+
+
 
   document.getElementById("applyDefaulter").addEventListener("click", () => {
 
@@ -562,10 +566,57 @@ else if (report === 'defaulter') {
   }
 }
 
+//dynamic class teacher
+function normalizeYear(y) {
+  if (y === "FY") return 1;
+  if (y === "SY") return 2;
+  if (y === "TY") return 3;
+  return null;
+}
+
+
+function updateReportDropdown() {
+  const reportSelect = document.getElementById("report-select");
+  const yearValue = document.getElementById("year-select").value;
+  const selectedYear = normalizeYear(yearValue);
+
+  console.log({
+    dropdownValue: yearValue,
+    normalizedYear: selectedYear,
+    assignedYear: window.classTeacherInfo?.year,
+    isClassTeacher: window.classTeacherInfo?.is_class_teacher
+  });
+
+  // Reset base options
+  reportSelect.innerHTML = `
+    <option value="attendance">Take Attendance</option>
+    <option value="month">Monthly</option>
+    <option value="semester">Semester</option>
+    <option value="defaulter">Defaulter</option>
+  `;
+
+  // ✅ Add ONLY when year matches assigned class teacher year
+  if (
+    window.classTeacherInfo &&
+    window.classTeacherInfo.is_class_teacher === true &&
+    selectedYear === window.classTeacherInfo.year
+  ) {
+    reportSelect.innerHTML += `
+      <option value="overall_report">Overall Report</option>
+      <option value="overall_defaulter">Overall Defaulter</option>
+    `;
+  }
+}
+
+
+
 // Event listeners
 document.querySelectorAll("#stream-select, #year-select").forEach(sel => {
   sel.addEventListener("change", loadStudents);
 });
+
+
+
 
 document.querySelectorAll("#subject-select, #lecture-time, #report-select")
   .forEach(sel => {
@@ -576,7 +627,67 @@ document.querySelectorAll("#subject-select, #lecture-time, #report-select")
   });
 
 
-// Initial load
+ /* document.addEventListener("DOMContentLoaded", () => {
+  const reportSelect = document.getElementById("report-select");
+
+  fetch("/api/teacher/class-teacher-info")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Class teacher info:", data);
+
+      if (data.is_class_teacher) {
+
+        const overallReport = document.createElement("option");
+        overallReport.value = "overall_report";
+        overallReport.textContent = "Overall Report";
+
+        const overallDefaulter = document.createElement("option");
+        overallDefaulter.value = "overall_defaulter";
+        overallDefaulter.textContent = "Overall Defaulter";
+
+        reportSelect.appendChild(overallReport);
+        reportSelect.appendChild(overallDefaulter);
+      }
+    })
+    .catch(err => console.error("Class teacher check failed", err));
+});*/
+
+//dynamic class teacher
+document.getElementById("year-select").addEventListener("change", () => {
+  updateReportDropdown();
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetch("/api/teacher/class-teacher-info")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Class teacher info loaded:", data);
+
+      // ✅ Store globally AFTER fetch
+      window.classTeacherInfo = {
+        is_class_teacher: data.is_class_teacher,
+        year: Number(data.year)   // force numeric
+      };
+
+      // 🔁 Update dropdown once data is ready
+      updateReportDropdown();
+    })
+    .catch(err => {
+      console.error("Failed to load class teacher info", err);
+      window.classTeacherInfo = null;
+    });
+});
+
+
+  /*document.addEventListener("DOMContentLoaded", () => {
+  updateReportDropdown();
+});*/
+
+
+
+
 // Initial load
 loadTeacherSubjects();   
 renderAttendance();

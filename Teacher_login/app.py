@@ -24,7 +24,7 @@ def get_db_connection(autocommit=False):
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="123456",
+        password="root",
         database="teacher",
         autocommit=autocommit,
     )
@@ -170,6 +170,42 @@ def get_teacher_subjects():
 
     return jsonify(subjects)
 
+def get_class_teacher_assignment():
+    if 'teacher_id' not in session:
+        return None
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT stream, year, academic_year
+        FROM class_teacher_assignment
+        WHERE teacher_id = %s
+    """, (session['teacher_id'],))
+
+    result = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return result
+
+#basic routing for class teacher
+@app.route("/api/teacher/class-teacher-info")
+def class_teacher_info():
+    info = get_class_teacher_assignment()
+
+    if not info:
+        return jsonify({"is_class_teacher": False})
+
+    return jsonify({
+        "is_class_teacher": True,
+        "stream": info["stream"],
+        "year": info["year"],
+        "academic_year": info["academic_year"]
+    })
+
+
 
 
 
@@ -194,7 +230,7 @@ def normalize_datetime(dt_str: str) -> str:
     return dt_str
 
 
-@app.route("/save_attendance", methods=["POST", "OPTIONS"])
+"""@app.route("/save_attendance", methods=["POST", "OPTIONS"])
 def save_attendance():
     if request.method == "OPTIONS":
         return "", 200
@@ -213,7 +249,7 @@ def save_attendance():
 
     try:
         cur.execute(
-            """
+            
             INSERT INTO lectures (lecture_key, subject, year, stream, lecture_date_time)
             VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
@@ -221,7 +257,7 @@ def save_attendance():
               year = VALUES(year),
               stream = VALUES(stream),
               lecture_date_time = VALUES(lecture_date_time)
-            """,
+            ,
             (lecture_key, subject, year, stream, lecture_date_time),
         )
 
@@ -230,10 +266,10 @@ def save_attendance():
         for student_id, status in attendance.items():
           status = 'P' if status.lower() == 'present' else 'A'
           cur.execute(
-        """
+        
         INSERT INTO attendance (lecture_key, student_id, status)
         VALUES (%s, %s, %s)
-        """,
+        ,
         (lecture_key, int(student_id), status),
     )
 
@@ -244,6 +280,81 @@ def save_attendance():
     except Exception as e:
         conn.rollback()
         return jsonify({"message": "Error saving attendance", "error": str(e)}), 500
+
+    finally:
+        cur.close()
+        conn.close()"""
+@app.route("/save_attendance", methods=["POST", "OPTIONS"])
+def save_attendance():
+    if request.method == "OPTIONS":
+        return "", 200
+
+    # 1️⃣ Login check
+    if "teacher_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+
+    lecture_key = data["lecture_key"]
+    subject = data["subject"]
+    year = (data["year"])
+    stream = data["stream"]
+    lecture_date_time = normalize_datetime(data["lecture_date_time"])
+    attendance = data["attendance"]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # 2️⃣ ✅ VERIFY subject belongs to teacher
+    """cur.execute(
+        SELECT 1
+        FROM teacher_subject_mapping tsm
+        JOIN subjects s ON s.id = tsm.subject_id
+        WHERE tsm.teacher_id = %s
+          AND s.subject_name = %s
+          AND tsm.stream = %s
+          AND tsm.year = %s
+    , (session["teacher_id"], subject, stream, year))"""
+    cur.execute("""
+    SELECT 1
+    FROM teacher_subject_mapping tsm
+    JOIN subjects s ON s.id = tsm.subject_id
+    WHERE tsm.teacher_id = %s
+      AND s.subject_name = %s
+""", (session["teacher_id"], subject))
+
+
+    if not cur.fetchone():
+        cur.close()
+        conn.close()
+        return jsonify({"error": "Not authorized for this subject"}), 403
+
+    try:
+        cur.execute("""
+            INSERT INTO lectures (lecture_key, subject, year, stream, lecture_date_time)
+            VALUES (%s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                subject = VALUES(subject),
+                year = VALUES(year),
+                stream = VALUES(stream),
+                lecture_date_time = VALUES(lecture_date_time)
+        """, (lecture_key, subject, year, stream, lecture_date_time))
+
+        cur.execute("DELETE FROM attendance WHERE lecture_key = %s", (lecture_key,))
+
+        for student_id, status in attendance.items():
+            status = 'P' if status.lower() == 'present' else 'A'
+            cur.execute("""
+                INSERT INTO attendance (lecture_key, student_id, status)
+                VALUES (%s, %s, %s)
+            """, (lecture_key, int(student_id), status))
+
+        conn.commit()
+        return jsonify({"message": "Attendance saved successfully!"})
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
 
     finally:
         cur.close()
