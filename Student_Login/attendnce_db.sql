@@ -1,30 +1,22 @@
-CREATE DATABASE IF NOT EXISTS attendance_db;
-USE attendance_db;
-
--- --------------------------------------------------------
--- Users/Students
--- --------------------------------------------------------
-DROP TABLE IF EXISTS students;
+USE attendance_system;
 CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20) UNIQUE NOT NULL,
-    name VARCHAR(100),
-    department VARCHAR(50),
-    year VARCHAR(5),
     roll_no VARCHAR(50) UNIQUE NOT NULL,
-    stream VARCHAR(10),
-    password VARCHAR(100)
+    stream VARCHAR(50) NOT NULL,
+    year VARCHAR(50) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- --------------------------------------------------------
 -- Subjects
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS subjects;
-CREATE TABLE subjects (
+
+CREATE TABLE IF NOT EXISTS subjects (
     id INT NOT NULL AUTO_INCREMENT,
     subject_name VARCHAR(100) NOT NULL,
     stream VARCHAR(50) NOT NULL,
-    year VARCHAR(5) NOT NULL,
+    year VARCHAR(50) NOT NULL,
     semester VARCHAR(20) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -32,33 +24,32 @@ CREATE TABLE subjects (
 -- --------------------------------------------------------
 -- Attendance
 -- --------------------------------------------------------
-DROP TABLE IF EXISTS attendance;
+
 CREATE TABLE attendance (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(20),
-    subject_id INT,
-    status ENUM('Present', 'Absent'),
-    date DATE,
-    semester VARCHAR(20),
-    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    roll_no VARCHAR(50) NOT NULL,
+    subject_id INT NOT NULL,
+    status ENUM('Present','Absent') NOT NULL,
+    date DATE NOT NULL,
+    semester VARCHAR(20) NOT NULL,
+    FOREIGN KEY (roll_no) REFERENCES students(roll_no),
     FOREIGN KEY (subject_id) REFERENCES subjects(id)
 );
 
--- --------------------------------------------------------
--- Seed Data
--- --------------------------------------------------------
 
 -- Students
-INSERT INTO students (student_id, name, department, year, roll_no, stream, password) VALUES 
-('1', 'Nidhi', 'CS', 'TY', '101', 'CS', '1234');
+INSERT INTO students (roll_no, stream, year, password) VALUES 
+('1', 'CS', 'TY', '1234');
 
--- Subjects
-INSERT INTO subjects (name) VALUES 
-('DBMS'), ('OS'), ('DSA'), ('Math');
+-- Subjects (Changed to Sem 3 to match user preference)
+INSERT INTO subjects (subject_name, stream, year, semester) VALUES 
+('DBMS', 'CS', 'TY', 'Sem 3'),
+('OS', 'CS', 'TY', 'Sem 3'),
+('DSA', 'CS', 'TY', 'Sem 3'),
+('Math', 'CS', 'TY', 'Sem 3');
 
--- Sample Attendance for student '1'
--- Assume IDs 1,2,3,4 for subjects
-INSERT INTO attendance (student_id, subject_id, status, date, semester) VALUES 
+-- Sample Attendance for student '1' (Changed to Sem 3)
+INSERT INTO attendance (roll_no, subject_id, status, date, semester) VALUES 
 ('1', 1, 'Present', '2023-01-01', 'Sem 3'),
 ('1', 1, 'Present', '2023-01-02', 'Sem 3'),
 ('1', 2, 'Absent', '2023-01-03', 'Sem 3'),
