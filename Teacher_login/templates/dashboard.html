@@ -81,6 +81,37 @@ body{margin:0; background: linear-gradient(180deg,var(--sky-100),#f8feff); color
   font-weight:600;
 }
 
+.dashboard-header {
+    display: flex;                  /* Horizontal layout */
+    justify-content: space-between; /* Left = title, Right = button */
+    align-items: center;            /* Vertical center */
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.header-left h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.logout-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #d32f2f;
+}
+
+
 
 
 .logo {width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg,var(--sky-500),var(--sky-300)); display:flex; align-items:center; justify-content:center; color:var(--white); font-weight:700; font-size:18px; box-shadow: 0 6px 14px rgba(0,0,0,0.06);}
@@ -106,6 +137,47 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
 </style>
 </head>
 <body>
+<!-- Custom Logout Alert -->
+<div id="logout-alert" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background:#f44336;
+  color:white;
+  padding:20px 30px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  z-index:9999;
+  text-align:center;
+  min-width:280px;
+">
+  <p>Do you really want to logout?</p>
+  <div style="margin-top:16px;">
+    <button id="logout-yes" style="
+      background:white;
+      color:#f44336;
+      padding:8px 16px;
+      border:none;
+      border-radius:5px;
+      font-weight:bold;
+      margin-right:12px;
+      cursor:pointer;
+    ">Yes</button>
+    <button id="logout-no" style="
+      background:#ddd;
+      color:#333;
+      padding:8px 16px;
+      border:none;
+      border-radius:5px;
+      font-weight:bold;
+      cursor:pointer;
+    ">No</button>
+  </div>
+</div>
 
 
 <!-- Custom Defaulter Alert -->
@@ -135,16 +207,31 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
 
 <div class="app">
   <!-- Header -->
-  <header class="header">
+  <!--header class="header"-->
+  <header class="header dashboard-header">
+  <div class="header-left"> 
+  
     <div class="brand">
-      <div class="logo">TA</div>
+      <!--<div class="logo">TA</div>-->
       <div>
         <div class="title">Teacher Dashboard</div>
-        <div class="subtitle">Sky Blue • Faculty View</div>
+        <div class="subtitle"></div>
+             
       </div>
     </div>
-  </header>
+  </div>
+  <div class="header-right">
+    <a href="{{ url_for('logout') }}" 
+   class="logout-btn" 
+   onclick="return confirmLogout();">
+   Logout
+</a>
 
+  </div>
+  </header>
+  
+  
+     
   <!-- Filters Section -->
   <section class="card">
     <div class="controls">
@@ -183,8 +270,8 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
         <label for="report-select">Report Type:</label>
         <select id="report-select">
           <option value="attendance">Take Attendance</option>
-          <option value="month">Monthly</option>
-          <option value="semester">Semester</option>
+          <!--option value="month">Monthly</option-->
+          <!--option value="semester">Semester</option-->
           <option value="defaulter">Defaulter</option>
         </select>
       </div>
@@ -197,7 +284,7 @@ body{background-color:#f5f7f4;  background-image: url("{{ url_for('static', file
 </div>
 
 <script>
-
+ 
   function showDefAlert(msg) {
   const box = document.getElementById("def-alert");
   box.innerText = msg;
@@ -230,6 +317,9 @@ async function loadTeacherSubjects() {
 }
 
 
+
+
+
 async function loadStudents() {
   const department = document.getElementById("stream-select").value;
   const year = document.getElementById("year-select").value;
@@ -246,7 +336,7 @@ async function loadStudents() {
     return;
   }
 
-  renderAttendance();
+  //renderAttendance();
 }
 
 
@@ -263,11 +353,20 @@ function getKey(){
 }
 
 function renderAttendance(){
-  const key = getKey();
-  if(!key){
-    document.getElementById("attendance-section").innerHTML = "<span class='muted'>Select lecture date & time first…</span>";
+    const subject = document.getElementById("subject-select").value;
+  const lectureTime = document.getElementById("lecture-time").value;
+
+  if (!subject || !lectureTime) {
+    document.getElementById("attendance-section").innerHTML =
+      "<span class='muted'>Please select Subject and Lecture Date & Time</span>";
     return;
   }
+
+  const key = getKey();
+  /*if(!key){
+    document.getElementById("attendance-section").innerHTML = "<span class='muted'>Select lecture date & time first…</span>";
+    return;
+  }*/
 
   if(!attendanceData[key]){
     attendanceData[key] = {};
@@ -295,7 +394,8 @@ function renderAttendance(){
   table.appendChild(tbody);
   container.appendChild(table);
 
-    const saveBtn = document.createElement('button');
+  const saveBtn = document.createElement('button');
+  saveBtn.type = "button"; 
   saveBtn.textContent = "Save Attendance";
   saveBtn.className = "present-btn";
   saveBtn.style.marginTop = "10px";
@@ -841,9 +941,9 @@ document.getElementById("exportExcel").onclick = ()=>{
 
 
 
-  else{
+ /* else{
     renderAttendance();
-  }
+  }*/
 }
 
 //dynamic class teacher
@@ -870,9 +970,9 @@ function updateReportDropdown() {
   // Reset base options
   reportSelect.innerHTML = `
     <option value="attendance">Take Attendance</option>
-    <option value="month">Monthly</option>
-    <option value="semester">Semester</option>
-    <option value="defaulter">Defaulter</option>
+    <!--option value="month">Monthly</option-->
+    <!--option value="semester">Semester</option-->
+    <option value="defaulter">Subject-wise Defaulter</option>
   `;
 
   // ✅ Add ONLY when year matches assigned class teacher year
@@ -894,6 +994,7 @@ function updateReportDropdown() {
 document.querySelectorAll("#stream-select, #year-select").forEach(sel => {
   sel.addEventListener("change", loadStudents);
 });
+
 
 
 
@@ -970,10 +1071,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Initial load
 loadTeacherSubjects();   
-renderAttendance();
+//renderAttendance();
 loadStudents();
 
 </script>
+
+<script>
+const logoutBtn = document.querySelector(".logout-btn");
+const logoutAlert = document.getElementById("logout-alert");
+const logoutYes = document.getElementById("logout-yes");
+const logoutNo = document.getElementById("logout-no");
+
+logoutBtn.addEventListener("click", (e) => {
+  e.preventDefault(); 
+  logoutAlert.style.display = "block"; 
+  setTimeout(() => {
+    logoutAlert.style.top = "50px"; 
+  }, 10);
+});
+
+logoutNo.addEventListener("click", () => {
+  logoutAlert.style.top = "-100px"; 
+  setTimeout(() => {
+    logoutAlert.style.display = "none"; 
+  }, 500);
+});
+
+logoutYes.addEventListener("click", () => {
+  window.location.href = logoutBtn.href; 
+});
+</script>
+</body>
 
 </body>
 </html>
