@@ -226,6 +226,7 @@ td {
     <!--<button class="btn back" onclick="goBack()">Back</button>-->
     <button class="btn back" onclick="goBackToTeacherMenu()">Back</button>
 
+<<<<<<< HEAD
 </div>
 
 
@@ -296,7 +297,56 @@ td {
 
     <button class="btn" onclick="assignClassTeacher()">Assign</button>
     <button class="btn back" onclick="goBackToTeacherMenu()">Back</button>
+=======
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 </div>
+
+
+<!-- ASSIGN SUBJECT -->
+<!-- ASSIGN SUBJECT -->
+<div id="assignSubject" class="section">
+    <h2>Assign Subject</h2>
+
+    <label>Teacher</label>
+    <select id="as_teacher"></select>
+
+    <label>Stream</label>
+    <select id="as_stream">
+        <option value="">Select</option>
+        <option value="IT">IT</option>
+        <option value="CS">CS</option>
+    </select>
+
+    <label>Year</label>
+    <select id="as_year">
+        <option value="">Select</option>
+        <option value="1">First Year</option>
+        <option value="2">Second Year</option>
+        <option value="3">Third Year</option>
+    </select>
+
+    <label>Semester</label>
+    <select id="as_semester">
+        <option value="">Select</option>
+        <option value="1">Sem 1</option>
+        <option value="2">Sem 2</option>
+        <option value="3">Sem 3</option>
+        <option value="4">Sem 4</option>
+        <option value="5">Sem 5</option>
+        <option value="6">Sem 6</option>
+    </select>
+
+    <label>Subject</label>
+    <select id="as_subject"></select>
+
+    <button class="btn" onclick="assignSubject()">Assign</button>
+   <!-- <button class="btn back" onclick="goBack()">Back</button>-->
+    <button class="btn back" onclick="goBackToTeacherMenu()">Back</button>
+
+</div>
+
+
+
 
 <!-- ADD STUDENT -->
 <div id="addStudent" class="section">
@@ -355,7 +405,11 @@ function openUpdateTeacher(id, name, dept){
 function hideAll(){
 
 
+<<<<<<< HEAD
     ["mainMenu","teacherMenu","studentMenu","addTeacher","viewTeacher","deleteTeacher","addStudent","viewStudent","deleteStudent", "assignSubject","assignClassTeacher","updateTeacher"]
+=======
+    ["mainMenu","teacherMenu","studentMenu","addTeacher","viewTeacher","deleteTeacher","addStudent","viewStudent","deleteStudent", "assignSubject","updateTeacher"]
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 
     .forEach(id => $(id).style.display="none");
 }
@@ -389,11 +443,14 @@ function showDeleteTeacher(){
     deleteList.innerHTML = "";
     loadTeacherDelete();
 }
+<<<<<<< HEAD
 function showAssignSubject(){
     hideAll();
     $("assignSubject").style.display = "block";
     loadAssignTeachers();
 }
+=======
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 
 function showAddStudent(){ hideAll(); $("addStudent").style.display="block"; }
 function showViewStudent(){ hideAll(); $("viewStudent").style.display="block"; loadStudents(); }
@@ -462,7 +519,11 @@ function saveTeacher(){
             tid.value = "";
             tpass.value = "";
         } else {
+<<<<<<< HEAD
             showAlert(d.message, "green");
+=======
+            showAlert(d.message, "red");
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
         }
     });
 }
@@ -500,9 +561,13 @@ d.forEach(t => teacherTable.innerHTML += `
 
 function loadTeacherDelete(){
 fetch("/get_teachers").then(r=>r.json()).then(d=>{
+<<<<<<< HEAD
 //deleteList.innerHTML="";
 deleteList.innerHTML = `<option disabled selected>Select teacher</option>`;
 
+=======
+deleteList.innerHTML="";
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 if(d.length === 0){
             deleteList.innerHTML = "<option>No teachers available</option>";
             return;
@@ -538,6 +603,7 @@ body:JSON.stringify({teacher_id:deleteList.value})})
     });
 }
 */
+<<<<<<< HEAD
 /*function deleteTeacherData() {
     const id = deleteList.value?.trim();  // ✅ trim spaces
 
@@ -554,10 +620,25 @@ body:JSON.stringify({teacher_id:deleteList.value})})
     fetch("/delete_teacher", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+=======
+function deleteTeacherData(){
+    const id = deleteList.value;
+
+    // 🔴 Prevent deleting placeholder
+    if(id === "" || id === "No teachers available"){
+        showAlert("No teacher selected");
+        return;
+    }
+
+    fetch("/delete_teacher",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
         body: JSON.stringify({ teacher_id: id })
     })
     .then(r => r.json())
     .then(d => {
+<<<<<<< HEAD
         if(d.success){
             showAlert(d.message, "green");
 
@@ -597,6 +678,23 @@ function deleteTeacherData() {
 }
 
 
+=======
+        showAlert(d.message, "green");
+
+        // ✅ FORCE UI refresh
+        deleteList.innerHTML = "";
+        loadTeacherDelete();
+        loadTeachers();
+    });
+}
+function showAssignSubject(){
+    hideAll();
+    $("assignSubject").style.display = "block";
+    loadAssignTeachers();
+}
+
+/* Load teachers */
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 function loadAssignTeachers(){
     fetch("/api/teachers")
     .then(r => r.json())
@@ -659,6 +757,7 @@ function assignSubject(){
 
 
 }
+<<<<<<< HEAD
 //assign class teacher
 function showAssignClassTeacher(){
     hideAll();
@@ -703,6 +802,8 @@ function assignClassTeacher(){
 }
 
 
+=======
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 function updateTeacher(){
     const name = utname.value.trim();
     const dept = utdept.value.trim();
@@ -849,6 +950,7 @@ function deleteStudentData(){
     });
 }
 
+<<<<<<< HEAD
 
 hideAll(); $("mainMenu").style.display="block";
 /* function showAlert(msg){
@@ -955,6 +1057,65 @@ document.getElementById("alertOk").onclick = function () {
 
 };
 </script>
+=======
+>>>>>>> 3da7c974424dd05f3c111d5295d94fe1e118be49
 
+hideAll(); $("mainMenu").style.display="block";
+/* function showAlert(msg){
+    document.getElementById("alertText").innerText = msg;
+    document.getElementById("customAlert").style.display = "flex";
+} */
+/*function showAlert(msg, color="red"){
+    const t = document.getElementById("alertText");
+    t.style.color = "";
+    t.innerText = msg;
+    t.style.color = color ;
+    document.getElementById("customAlert").style.display = "flex";
+}*/
+function showAlert(msg, color = "red"){
+    const t = document.getElementById("alertText");
+
+    t.innerText = msg;
+
+    // 🔥 FORCE COLOR (cannot be overridden)
+    t.style.setProperty("color", color, "important");
+
+    document.getElementById("customAlert").style.display = "flex";
+}
+
+
+
+function closeAlert(){
+    document.getElementById("customAlert").style.display = "none";
+}
+
+</script>
+<!-- Custom Alert Box -->
+<div id="customAlert" style="
+display:none;
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:rgba(0,0,0,0.4);
+justify-content:center;
+align-items:center;
+z-index:9999;
+">
+  <div style="
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  text-align:center;
+  min-width:280px;
+  ">
+    <!--<p id="alertText"></p>-->
+    <!--<p id="alertText" style="color:red; font-size:16px;"></p>-->
+    <p id="alertText" style="font-size:16px;"></p>
+
+
+
+    <button onclick="closeAlert()" class="btn">OK</button>
+  </div>
+</div>
 </body>
 </html>

@@ -74,14 +74,6 @@ def admin_logout():
 @app.route("/add_teacher", methods=["POST"])
 def add_teacher():
     data = request.json
-
-    #  BACKEND SAFETY CHECK
-    if not data.get("name") or not data.get("department") or not data.get("teacher_id") or not data.get("password"):
-        return jsonify({
-            "status": "fail",
-            "message": "Fill all the fields"
-        })
-
     db = get_db_connection()
     cursor = db.cursor()
 
@@ -167,6 +159,29 @@ def delete_teacher():
             cursor.close()
         if conn:
             conn.close()
+
+@app.route("/update_teacher", methods=["POST"])
+def update_teacher():
+    data = request.json
+
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        UPDATE teachers
+        SET name=%s, department=%s
+        WHERE teacher_id=%s
+    """, (
+        data["name"],
+        data["department"],
+        data["teacher_id"]
+    ))
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    return jsonify({"message": "Teacher updated successfully"})
 
 @app.route("/update_teacher", methods=["POST"])
 def update_teacher():
